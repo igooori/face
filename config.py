@@ -5,4 +5,4 @@ load_dotenv()
 
 TOKEN=getenv('TOKEN')
 GEMINI=getenv('GEMINI')
-PROXY_URL=getenv(PROXY_URL)
+PROXY_URL=getenv('PROXY_URL')

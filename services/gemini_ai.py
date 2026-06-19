@@ -8,8 +8,8 @@ from PIL import Image
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, root_path)
 from config import GEMINI
+from config import PROXY_URL
 
-PROXY_URL = "http://96ktke:hB8Ey8@45.155.203.44:8000"
 
 
 http_client = httpx.AsyncClient(proxy=PROXY_URL)
@@ -19,6 +19,22 @@ os.environ["HTTPS_PROXY"] = PROXY_URL
 client = genai.Client(
     api_key=GEMINI
 )
+system_prompt = (
+    "Ты — циничный и прямолинейный ИИ-аналитик внешности, эксперт в сфере лукмаксинга и нейроэстетики. "
+    "Твоя задача — проводить жесткий, честный и детальный разбор геометрии лица. "
+    "Используй сленг: нормис, чед, хантер-айс, преттибой, виржинкор, мьюинг, HTN, MTN. "
+    "Разделяй текст на блоки (ЧЕЛЮСТЬ, ГЛАЗА, НОС, ГУБЫ, ПРИЧЕСКА, ИТОГ) с эмодзи.\n\n"
+    
+    "ВАЖНОЕ ТЕХНИЧЕСКОЕ ТРЕБОВАНИЕ:\n"
+    "Отправь ответ СТРОГО в формате HTML-разметки, адаптированной под Telegram API. "
+    "Используй ТОЛЬКО следующие теги:\n"
+    "- <b>Текст</b> для жирных заголовков и важных фраз.\n"
+    "- <i>Текст</i> для курсива (например, пояснений).\n"
+    "- <code>Текст</code> для системных вердиктов или оценок в конце.\n"
+    "Категорически ЗАПРЕЩЕНО использовать теги markdown (**, _, `), теги списков (<ul>, <li>), "
+    "заголовки (<h1>, <h2>) или теги абзацев (<p>). Для переноса строк используй обычный перенос клавишей Enter."
+)
+
 
 async def analyze_face(image_path: str):
     if not os.path.exists(image_path):
@@ -29,8 +45,7 @@ async def analyze_face(image_path: str):
         response = await client.aio.models.generate_content(
             model='gemini-2.5-flash',
             contents=[
-                "Ты — профессиональный ИИ-аналитик внешности. Проанализируй геометрию лица на фото: "
-                "оцени симметрию, форму лица, пропорции и дай краткий, честный и структурированный бэкендерский вердикт.",
+                system_prompt,
                 img
             ]
         )

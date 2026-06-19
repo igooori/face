@@ -11,7 +11,7 @@ router = Router()
 async def photo_face(message:Message, bot:Bot):
     local_path = await save_photo(bot, message.photo[-1], message.from_user.id)
     report = await analyze_face(local_path)
-    await message.answer(report)
+    await message.answer(report, parse_mode='HTML')
     os.remove(local_path)
     
     
